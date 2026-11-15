@@ -47,4 +47,14 @@ func main() {
 	}
 
 	DisplayProducts(products)
+
+	success2 := DeleteProduct(&products, 3)
+
+	if success2 {
+		fmt.Println("Product deleted successfully!")
+	} else {
+		fmt.Println("Product not found!")
+	}
+
+	DisplayProducts(products)
 }

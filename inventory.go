@@ -46,3 +46,15 @@ func UpdateStock(products *[]Product, id int, amount int) bool {
 
 	return false
 }
+
+func DeleteProduct(products *[]Product, id int) bool {
+	for i := range *products {
+		if (*products)[i].ID == id {
+
+			*products = append((*products)[:i], (*products)[i+1:]...)
+			return true
+		}
+
+	}
+	return false
+}

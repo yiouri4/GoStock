@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "name": "Milk",
+        "price": 1.49,
+        "quantity": 50
+    },
+    {
+        "id": 2,
+        "name": "Bread",
+        "price": 0.89,
+        "quantity": 30
+    },
+    {
+        "id": 3,
+        "name": "Eggs",
+        "price": 2.99,
+        "quantity": 20
+    },
+    {
+        "id": 4,
+        "name": "Rice",
+        "price": 1.79,
+        "quantity": 40
+    },
+    {
+        "id": 5,
+        "name": "Coffee",
+        "price": 4.50,
+        "quantity": 15
+    }
+]
