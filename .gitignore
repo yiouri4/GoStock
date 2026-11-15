@@ -1,0 +1,14 @@
+# Go compiled binaries
+*.exe
+*.out
+*.test
+
+# Environment variables and secrets
+.env
+
+# IDE settings
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
