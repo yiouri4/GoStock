@@ -27,13 +27,13 @@ func main() {
 		fmt.Println("5. Delete Product")
 		fmt.Println("6. Exit")
 
-		fmt.Print("\nChoose an option: ")
+		input, ok := ReadInput(scanner, "\nChoose an option: ")
 
-		if !scanner.Scan() {
+		if !ok {
 			return
 		}
 
-		choice, err := strconv.Atoi(scanner.Text())
+		choice, err := strconv.Atoi(input)
 
 		if err != nil {
 			fmt.Println("Invalid input! Please enter a number.")
@@ -51,44 +51,51 @@ func main() {
 			var name string
 			var price float64
 			var quantity int
+			{
+			}
+			input, ok := ReadInput(scanner, "Enter product ID: ")
 
-			fmt.Print("Enter product ID: ")
-			if !scanner.Scan() {
+			if !ok {
 				return
 			}
 
-			id, err = strconv.Atoi(scanner.Text())
+			id, err = strconv.Atoi(input)
 
 			if err != nil {
 				fmt.Println("Invalid ID! Please enter a number.")
 				break
 			}
 
-			fmt.Print("Enter product name: ")
-			if !scanner.Scan() {
+			input, ok = ReadInput(scanner, "Enter product name: ")
+
+			if !ok {
 				return
 			}
+
+			name = input
 
 			name = scanner.Text()
 
-			fmt.Print("Enter product price: ")
-			if !scanner.Scan() {
+			input, ok = ReadInput(scanner, "Enter product price: ")
+
+			if !ok {
 				return
 			}
 
-			price, err = strconv.ParseFloat(scanner.Text(), 64)
+			price, err = strconv.ParseFloat(input, 64)
 
 			if err != nil {
 				fmt.Println("Invalid price!")
 				break
 			}
 
-			fmt.Print("Enter product quantity: ")
-			if !scanner.Scan() {
+			input, ok = ReadInput(scanner, "Enter product quantity: ")
+
+			if !ok {
 				return
 			}
 
-			quantity, err = strconv.Atoi(scanner.Text())
+			quantity, err = strconv.Atoi(input)
 
 			if err != nil {
 				fmt.Println("Invalid quantity!")
@@ -141,17 +148,19 @@ func main() {
 		case 3:
 
 			var id int
+			{
+				input, ok := ReadInput(scanner, "Enter product ID: ")
 
-			fmt.Print("Enter product ID: ")
-			if !scanner.Scan() {
-				return
-			}
+				if !ok {
+					return
+				}
 
-			id, err = strconv.Atoi(scanner.Text())
+				id, err = strconv.Atoi(input)
 
-			if err != nil {
-				fmt.Println("Invalid ID!")
-				break
+				if err != nil {
+					fmt.Println("Invalid ID!")
+					break
+				}
 			}
 
 			foundProduct, found := FindProduct(products, id)
@@ -173,28 +182,33 @@ func main() {
 			var id int
 			var amount int
 
-			fmt.Print("Enter product ID: ")
-			if !scanner.Scan() {
-				return
+			{
+				input, ok := ReadInput(scanner, "Enter product ID: ")
+
+				if !ok {
+					return
+				}
+
+				id, err = strconv.Atoi(input)
+
+				if err != nil {
+					fmt.Println("Invalid ID!")
+					break
+				}
 			}
+			{
+				input, ok := ReadInput(scanner, "Enter quantity change (use negative number to decrease): ")
 
-			id, err = strconv.Atoi(scanner.Text())
+				if !ok {
+					return
+				}
 
-			if err != nil {
-				fmt.Println("Invalid ID!")
-				break
-			}
+				amount, err = strconv.Atoi(input)
 
-			fmt.Print("Enter quantity change (use negative number to decrease): ")
-			if !scanner.Scan() {
-				return
-			}
-
-			amount, err = strconv.Atoi(scanner.Text())
-
-			if err != nil {
-				fmt.Println("Invalid quantity!")
-				break
+				if err != nil {
+					fmt.Println("Invalid quantity!")
+					break
+				}
 			}
 
 			updated := UpdateStock(&products, id, amount)
