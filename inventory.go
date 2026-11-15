@@ -17,8 +17,15 @@ func DisplayProducts(products []Product) {
 	}
 }
 
-func AddProduct(products *[]Product, newProduct Product) {
+func AddProduct(products *[]Product, newProduct Product) bool {
+	for _, product := range *products {
+		if product.ID == newProduct.ID {
+			return false
+		}
+	}
+
 	*products = append(*products, newProduct)
+	return true
 }
 
 func FindProduct(products []Product, id int) (Product, bool) {
