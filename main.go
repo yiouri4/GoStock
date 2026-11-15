@@ -219,6 +219,10 @@ func main() {
 
 			fmt.Print("Enter product ID to delete: ")
 			if !scanner.Scan() {
+				if err := scanner.Err(); err != nil {
+					fmt.Println("Error reading input:", err)
+				}
+
 				return
 			}
 
