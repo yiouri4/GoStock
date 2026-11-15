@@ -1,8 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+)
 
 func main() {
+
+	scanner := bufio.NewScanner(os.Stdin)
 
 	products, err := LoadProducts()
 
@@ -20,12 +27,21 @@ func main() {
 		fmt.Println("5. Delete Product")
 		fmt.Println("6. Exit")
 
-		var choice int
-
 		fmt.Print("\nChoose an option: ")
-		fmt.Scan(&choice)
+
+		if !scanner.Scan() {
+			return
+		}
+
+		choice, err := strconv.Atoi(scanner.Text())
+
+		if err != nil {
+			fmt.Println("Invalid input! Please enter a number.")
+			continue
+		}
 
 		switch choice {
+
 		case 1:
 			DisplayProducts(products)
 
@@ -37,16 +53,47 @@ func main() {
 			var quantity int
 
 			fmt.Print("Enter product ID: ")
-			fmt.Scan(&id)
+			if !scanner.Scan() {
+				return
+			}
 
-			fmt.Print("Enter product name (one word for now): ")
-			fmt.Scan(&name)
+			id, err = strconv.Atoi(scanner.Text())
+
+			if err != nil {
+				fmt.Println("Invalid ID! Please enter a number.")
+				break
+			}
+
+			fmt.Print("Enter product name: ")
+			if !scanner.Scan() {
+				return
+			}
+
+			name = scanner.Text()
 
 			fmt.Print("Enter product price: ")
-			fmt.Scan(&price)
+			if !scanner.Scan() {
+				return
+			}
+
+			price, err = strconv.ParseFloat(scanner.Text(), 64)
+
+			if err != nil {
+				fmt.Println("Invalid price!")
+				break
+			}
 
 			fmt.Print("Enter product quantity: ")
-			fmt.Scan(&quantity)
+			if !scanner.Scan() {
+				return
+			}
+
+			quantity, err = strconv.Atoi(scanner.Text())
+
+			if err != nil {
+				fmt.Println("Invalid quantity!")
+				break
+			}
 
 			if id <= 0 {
 				fmt.Println("ID must be greater than 0")
@@ -67,6 +114,7 @@ func main() {
 				fmt.Println("Quantity cannot be negative")
 				break
 			}
+
 			newProduct := Product{
 				ID:       id,
 				Name:     name,
@@ -91,13 +139,111 @@ func main() {
 			fmt.Println("Product added successfully!")
 
 		case 3:
-			fmt.Println("Find Product - Coming soon!")
+
+			var id int
+
+			fmt.Print("Enter product ID: ")
+			if !scanner.Scan() {
+				return
+			}
+
+			id, err = strconv.Atoi(scanner.Text())
+
+			if err != nil {
+				fmt.Println("Invalid ID!")
+				break
+			}
+
+			foundProduct, found := FindProduct(products, id)
+
+			if found {
+				fmt.Printf(
+					"ID: %d | Name: %s | Price: €%.2f | Stock: %d\n",
+					foundProduct.ID,
+					foundProduct.Name,
+					foundProduct.Price,
+					foundProduct.Quantity,
+				)
+			} else {
+				fmt.Println("Product not found!")
+			}
 
 		case 4:
-			fmt.Println("Update Stock - Coming soon!")
+
+			var id int
+			var amount int
+
+			fmt.Print("Enter product ID: ")
+			if !scanner.Scan() {
+				return
+			}
+
+			id, err = strconv.Atoi(scanner.Text())
+
+			if err != nil {
+				fmt.Println("Invalid ID!")
+				break
+			}
+
+			fmt.Print("Enter quantity change (use negative number to decrease): ")
+			if !scanner.Scan() {
+				return
+			}
+
+			amount, err = strconv.Atoi(scanner.Text())
+
+			if err != nil {
+				fmt.Println("Invalid quantity!")
+				break
+			}
+
+			updated := UpdateStock(&products, id, amount)
+
+			if !updated {
+				fmt.Println("Stock update failed! Product not found or insufficient stock.")
+				break
+			}
+
+			err = SaveProducts(products)
+
+			if err != nil {
+				fmt.Println("Error saving inventory:", err)
+				return
+			}
+
+			fmt.Println("Stock updated successfully!")
 
 		case 5:
-			fmt.Println("Delete Product - Coming soon!")
+
+			var id int
+
+			fmt.Print("Enter product ID to delete: ")
+			if !scanner.Scan() {
+				return
+			}
+
+			id, err = strconv.Atoi(scanner.Text())
+
+			if err != nil {
+				fmt.Println("Invalid ID!")
+				break
+			}
+
+			deleted := DeleteProduct(&products, id)
+
+			if !deleted {
+				fmt.Println("Product not found!")
+				break
+			}
+
+			err = SaveProducts(products)
+
+			if err != nil {
+				fmt.Println("Error saving inventory:", err)
+				return
+			}
+
+			fmt.Println("Product deleted successfully!")
 
 		case 6:
 			fmt.Println("Thank you for using GoStock!")
