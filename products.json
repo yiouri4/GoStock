@@ -1,183 +1,182 @@
-
 [
     {
-        "id": 1,
-        "name": "Fresh Milk 1L",
-        "price": 1.49,
-        "quantity": 50
+        "ID": 1,
+        "Name": "Fresh Milk 1L",
+        "Price": 1.49,
+        "Quantity": 50
     },
     {
-        "id": 2,
-        "name": "Whole Wheat Bread",
-        "price": 1.19,
-        "quantity": 35
+        "ID": 2,
+        "Name": "Whole Wheat Bread",
+        "Price": 1.19,
+        "Quantity": 35
     },
     {
-        "id": 3,
-        "name": "Free Range Eggs 10pcs",
-        "price": 2.99,
-        "quantity": 20
+        "ID": 3,
+        "Name": "Free Range Eggs 10pcs",
+        "Price": 2.99,
+        "Quantity": 20
     },
     {
-        "id": 4,
-        "name": "Basmati Rice 1kg",
-        "price": 2.49,
-        "quantity": 40
+        "ID": 4,
+        "Name": "Basmati Rice 1kg",
+        "Price": 2.49,
+        "Quantity": 40
     },
     {
-        "id": 5,
-        "name": "Ground Coffee 250g",
-        "price": 4.50,
-        "quantity": 15
+        "ID": 5,
+        "Name": "Ground Coffee 250g",
+        "Price": 4.5,
+        "Quantity": 15
     },
     {
-        "id": 6,
-        "name": "Butter 250g",
-        "price": 2.49,
-        "quantity": 28
+        "ID": 6,
+        "Name": "Butter 250g",
+        "Price": 2.49,
+        "Quantity": 28
     },
     {
-        "id": 7,
-        "name": "Greek Yogurt 500g",
-        "price": 2.19,
-        "quantity": 32
+        "ID": 7,
+        "Name": "Greek Yogurt 500g",
+        "Price": 2.19,
+        "Quantity": 32
     },
     {
-        "id": 8,
-        "name": "Cheddar Cheese 200g",
-        "price": 2.79,
-        "quantity": 18
+        "ID": 8,
+        "Name": "Cheddar Cheese 200g",
+        "Price": 2.79,
+        "Quantity": 18
     },
     {
-        "id": 9,
-        "name": "Orange Juice 1L",
-        "price": 1.89,
-        "quantity": 25
+        "ID": 9,
+        "Name": "Orange Juice 1L",
+        "Price": 1.89,
+        "Quantity": 25
     },
     {
-        "id": 10,
-        "name": "Mineral Water 1.5L",
-        "price": 0.65,
-        "quantity": 100
+        "ID": 10,
+        "Name": "Mineral Water 1.5L",
+        "Price": 0.65,
+        "Quantity": 100
     },
     {
-        "id": 11,
-        "name": "Pasta Spaghetti 500g",
-        "price": 0.99,
-        "quantity": 60
+        "ID": 11,
+        "Name": "Pasta Spaghetti 500g",
+        "Price": 0.99,
+        "Quantity": 60
     },
     {
-        "id": 12,
-        "name": "Tomato Sauce 500g",
-        "price": 1.39,
-        "quantity": 45
+        "ID": 12,
+        "Name": "Tomato Sauce 500g",
+        "Price": 1.39,
+        "Quantity": 45
     },
     {
-        "id": 13,
-        "name": "Olive Oil 1L",
-        "price": 8.99,
-        "quantity": 12
+        "ID": 13,
+        "Name": "Olive Oil 1L",
+        "Price": 8.99,
+        "Quantity": 12
     },
     {
-        "id": 14,
-        "name": "White Sugar 1kg",
-        "price": 1.29,
-        "quantity": 38
+        "ID": 14,
+        "Name": "White Sugar 1kg",
+        "Price": 1.29,
+        "Quantity": 38
     },
     {
-        "id": 15,
-        "name": "All Purpose Flour 1kg",
-        "price": 0.89,
-        "quantity": 42
+        "ID": 15,
+        "Name": "All Purpose Flour 1kg",
+        "Price": 0.89,
+        "Quantity": 42
     },
     {
-        "id": 16,
-        "name": "Potato Chips 150g",
-        "price": 1.49,
-        "quantity": 55
+        "ID": 16,
+        "Name": "Potato Chips 150g",
+        "Price": 1.49,
+        "Quantity": 55
     },
     {
-        "id": 17,
-        "name": "Milk Chocolate 100g",
-        "price": 1.25,
-        "quantity": 70
+        "ID": 17,
+        "Name": "Milk Chocolate 100g",
+        "Price": 1.25,
+        "Quantity": 70
     },
     {
-        "id": 18,
-        "name": "Oatmeal 500g",
-        "price": 1.79,
-        "quantity": 24
+        "ID": 18,
+        "Name": "Oatmeal 500g",
+        "Price": 1.79,
+        "Quantity": 24
     },
     {
-        "id": 19,
-        "name": "Corn Flakes 375g",
-        "price": 2.49,
-        "quantity": 19
+        "ID": 19,
+        "Name": "Corn Flakes 375g",
+        "Price": 2.49,
+        "Quantity": 19
     },
     {
-        "id": 20,
-        "name": "Frozen Pizza",
-        "price": 3.99,
-        "quantity": 14
+        "ID": 20,
+        "Name": "Frozen Pizza",
+        "Price": 3.99,
+        "Quantity": 14
     },
     {
-        "id": 21,
-        "name": "Chicken Breast 1kg",
-        "price": 7.49,
-        "quantity": 16
+        "ID": 21,
+        "Name": "Chicken Breast 1kg",
+        "Price": 7.49,
+        "Quantity": 16
     },
     {
-        "id": 22,
-        "name": "Ground Beef 500g",
-        "price": 5.99,
-        "quantity": 13
+        "ID": 22,
+        "Name": "Ground Beef 500g",
+        "Price": 5.99,
+        "Quantity": 13
     },
     {
-        "id": 23,
-        "name": "Fresh Apples 1kg",
-        "price": 1.99,
-        "quantity": 30
+        "ID": 23,
+        "Name": "Fresh Apples 1kg",
+        "Price": 1.99,
+        "Quantity": 30
     },
     {
-        "id": 24,
-        "name": "Bananas 1kg",
-        "price": 1.59,
-        "quantity": 27
+        "ID": 24,
+        "Name": "Bananas 1kg",
+        "Price": 1.59,
+        "Quantity": 27
     },
     {
-        "id": 25,
-        "name": "Tomatoes 1kg",
-        "price": 2.29,
-        "quantity": 22
+        "ID": 25,
+        "Name": "Tomatoes 1kg",
+        "Price": 2.29,
+        "Quantity": 22
     },
     {
-        "id": 26,
-        "name": "Dishwashing Liquid",
-        "price": 1.69,
-        "quantity": 31
+        "ID": 26,
+        "Name": "Dishwashing Liquid",
+        "Price": 1.69,
+        "Quantity": 31
     },
     {
-        "id": 27,
-        "name": "Laundry Detergent 2L",
-        "price": 6.49,
-        "quantity": 11
+        "ID": 27,
+        "Name": "Laundry Detergent 2L",
+        "Price": 6.49,
+        "Quantity": 11
     },
     {
-        "id": 28,
-        "name": "Toilet Paper 8 Rolls",
-        "price": 3.49,
-        "quantity": 40
+        "ID": 28,
+        "Name": "Toilet Paper 8 Rolls",
+        "Price": 3.49,
+        "Quantity": 40
     },
     {
-        "id": 29,
-        "name": "Shampoo 400ml",
-        "price": 3.29,
-        "quantity": 17
+        "ID": 29,
+        "Name": "Shampoo 400ml",
+        "Price": 3.29,
+        "Quantity": 25
     },
     {
-        "id": 30,
-        "name": "Toothpaste 75ml",
-        "price": 1.89,
-        "quantity": 26
+        "ID": 30,
+        "Name": "Toothpaste 75ml",
+        "Price": 1.89,
+        "Quantity": 30
     }
 ]

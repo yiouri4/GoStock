@@ -25,7 +25,8 @@ func main() {
 		fmt.Println("3. Find Product")
 		fmt.Println("4. Update Stock")
 		fmt.Println("5. Delete Product")
-		fmt.Println("6. Exit")
+		fmt.Println("6. Low Stock Alerts")
+		fmt.Println("7. Exit")
 
 		input, ok := ReadInput(scanner, "\nChoose an option: ")
 
@@ -231,20 +232,19 @@ func main() {
 
 			var id int
 
-			fmt.Print("Enter product ID to delete: ")
-			if !scanner.Scan() {
-				if err := scanner.Err(); err != nil {
-					fmt.Println("Error reading input:", err)
+			{
+				input, ok := ReadInput(scanner, "Enter product ID to delete: ")
+
+				if !ok {
+					return
 				}
 
-				return
-			}
+				id, err = strconv.Atoi(input)
 
-			id, err = strconv.Atoi(scanner.Text())
-
-			if err != nil {
-				fmt.Println("Invalid ID!")
-				break
+				if err != nil {
+					fmt.Println("Invalid ID!")
+					break
+				}
 			}
 
 			deleted := DeleteProduct(&products, id)
@@ -264,11 +264,14 @@ func main() {
 			fmt.Println("Product deleted successfully!")
 
 		case 6:
+			LowStockAlerts(products)
+
+		case 7:
 			fmt.Println("Thank you for using GoStock!")
 			return
 
 		default:
-			fmt.Println("Invalid option. Please choose 1-6.")
+			fmt.Println("Invalid option. Please choose 1-7.")
 		}
 	}
 }

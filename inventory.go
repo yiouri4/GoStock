@@ -65,3 +65,13 @@ func DeleteProduct(products *[]Product, id int) bool {
 	}
 	return false
 }
+
+func LowStockAlerts(products []Product) {
+	fmt.Println("\n========== LOW STOCK ALERTS ==========")
+
+	for _, product := range products {
+		if product.Quantity < 10 {
+			fmt.Printf("ALERT: %s (ID: %d) is running low! Current stock: %d\n", product.Name, product.ID, product.Quantity)
+		}
+	}
+}
