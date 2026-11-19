@@ -1,34 +1,76 @@
 
 <script setup>
-
 import { ref, computed } from 'vue'
 
-const totalProducts = ref(125)
-const inventoryValue = ref(8450)
-const lowStock = ref(8)
+// Sidebar navigation
+const activeSection = ref('dashboard')
+
+// Products
 const products = ref([
   { id: 1, name: 'Laptop', price: 899.99, quantity: 5 },
   { id: 2, name: 'Mouse', price: 24.99, quantity: 25 },
   { id: 3, name: 'Keyboard', price: 59.99, quantity: 8 },
   { id: 4, name: 'Monitor', price: 249.99, quantity: 3 },
 ])
+
+// Dashboard calculations
+const totalProducts = computed(() => {
+  return products.value.length
+})
+
+const totalStockUnits = computed(() => {
+  return products.value.reduce((total, product) => {
+    return total + product.quantity
+  }, 0)
+})
+
+const inventoryValue = computed(() => {
+  return products.value.reduce((total, product) => {
+    return total + (product.price * product.quantity)
+  }, 0)
+})
+
+const lowStock = computed(() => {
+  return products.value.filter(product => product.quantity < 10).length
+})
+
+// Search
 const searchQuery = ref('')
+
 const filteredProducts = computed(() => {
   return products.value.filter(product =>
     product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
+// Form fields
 const newProductName = ref('')
 const newProductPrice = ref('')
 const newProductQuantity = ref('')
 
+// Add product
 function addProduct() {
+  const price = Number(newProductPrice.value)
+  const quantity = Number(newProductQuantity.value)
+
+  if (
+    newProductName.value.trim() === '' ||
+    newProductPrice.value === '' ||
+    newProductQuantity.value === '' ||
+    !Number.isFinite(price) ||
+    !Number.isFinite(quantity) ||
+    price < 0 ||
+    quantity < 0
+  ) {
+    alert('Please enter a valid name, price and quantity.')
+    return
+  }
+
   const product = {
     id: Date.now(),
     name: newProductName.value,
-    price: Number(newProductPrice.value),
-    quantity: Number(newProductQuantity.value)
+    price: price,
+    quantity: quantity
   }
 
   products.value.push(product)
@@ -38,7 +80,7 @@ function addProduct() {
   newProductQuantity.value = ''
 }
 
-
+// Edit product
 const editingProductId = ref(null)
 
 function startEditing(product) {
@@ -68,8 +110,37 @@ function updateProduct() {
   newProductPrice.value = ''
   newProductQuantity.value = ''
 }
-</script>
 
+// Delete product
+function deleteProduct(id) {
+  const confirmed = confirm('Are you sure you want to delete this product?')
+
+  if (!confirmed) {
+    return
+  }
+
+  products.value = products.value.filter(
+    product => product.id !== id
+  )
+}
+
+// Update stock
+function updateStock(id, amount) {
+  const product = products.value.find(
+    product => product.id === id
+  )
+
+  if (!product) {
+    return
+  }
+
+  if (product.quantity + amount < 0) {
+    return
+  }
+
+  product.quantity += amount
+}
+</script>
 
 <template>
   <div class="app-container">
@@ -79,254 +150,717 @@ function updateProduct() {
       <h2>GoStock</h2>
 
       <nav>
-        <a href="#" class="active">Dashboard</a>
-        <a href="#">Products</a>
-        <a href="#">Stock Management</a>
+        <a
+          href="#dashboard"
+          :class="{ active: activeSection === 'dashboard' }"
+          @click="activeSection = 'dashboard'"
+        >
+          Dashboard
+        </a>
+
+        <a
+          href="#products"
+          :class="{ active: activeSection === 'products' }"
+          @click="activeSection = 'products'"
+        >
+          Products
+        </a>
+
+        <a
+          href="#stock-management"
+          :class="{ active: activeSection === 'stock-management' }"
+          @click="activeSection = 'stock-management'"
+        >
+          Stock Management
+        </a>
       </nav>
     </aside>
 
     <!-- Main content -->
-    <main class="main-content">
-     <h1>Dashboard</h1>
-<p>Welcome to your inventory management system.</p>
-<div class="add-product-section">
-  <h2>Add New Product</h2>
+    <main id="dashboard" class="main-content">
 
-  <div class="form-group">
-    <label>Product Name</label>
-    <input
-      v-model="newProductName"
-      type="text"
-      placeholder="Enter product name"
-    />
-  </div>
+      <h1>Dashboard</h1>
+      <p>Welcome to your inventory management system.</p>
 
-  <div class="form-group">
-    <label>Price (€)</label>
-    <input
-      v-model="newProductPrice"
-      type="number"
-      placeholder="Enter price"
-    />
-  </div>
+      <!-- Dashboard cards -->
+      <div class="dashboard-cards">
 
-  <div class="form-group">
-    <label>Quantity</label>
-    <input
-      v-model="newProductQuantity"
-      type="number"
-      placeholder="Enter quantity"
-    />
-  </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Total Products</h3>
+            <span class="card-icon blue">📦</span>
+          </div>
+          <p class="card-number">{{ totalProducts }}</p>
+          <p class="card-description">Different products in inventory</p>
+        </div>
 
-  <button @click="editingProductId === null ? addProduct() : updateProduct()">
-    {{ editingProductId === null ? 'Add Product' : 'Update Product' }}
-  </button>
-</div>
-<div class="dashboard-cards">
+        <div class="card">
+          <div class="card-header">
+            <h3>Inventory Value</h3>
+            <span class="card-icon green">💰</span>
+          </div>
+          <p class="card-number">€{{ inventoryValue.toFixed(2) }}</p>
+          <p class="card-description">Total value of current stock</p>
+        </div>
 
-  <div class="card">
-    <h3>Total Products</h3>
-    <p class="card-number">{{ totalProducts }}</p>
-  </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Low Stock</h3>
+            <span class="card-icon orange">⚠️</span>
+          </div>
+          <p class="card-number">{{ lowStock }}</p>
+          <p class="card-description">Products with fewer than 10 units</p>
+        </div>
 
-  <div class="card">
-    <h3>Inventory Value</h3>
-    <p class="card-number">€{{ inventoryValue }}</p>
-  </div>
+      </div>
 
-  <div class="card">
-    <h3>Low Stock</h3>
-    <p class="card-number">{{ lowStock }}</p>
-  </div>
-<div class="products-section">
-  <h2>Products</h2>
-  <input
-  v-model="searchQuery"
-  type="text"
-  placeholder="Search products..."
-  class="search-input"
-/>
+      <!-- Add / Edit Product Form -->
+      <div class="add-product-section">
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Price</th>
-        <th>Quantity</th>
-      </tr>
-    </thead>
+        <h2>
+          {{ editingProductId === null ? 'Add New Product' : 'Edit Product' }}
+        </h2>
 
-    <tbody>
-      <tr v-for="product in filteredProducts" :key="product.id">
-        <td>{{ product.id }}</td>
-        <td>{{ product.name }}</td>
-        <td>€{{ product.price.toFixed(2) }}</td>
-        <td>{{ product.quantity }}</td>
-        <td>
-        <button @click="startEditing(product)">Edit</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  
-</div>  
-</div>
+        <div class="form-group">
+          <label>Product Name</label>
+          <input
+            v-model="newProductName"
+            type="text"
+            placeholder="Enter product name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Price (€)</label>
+          <input
+            v-model="newProductPrice"
+            type="number"
+            placeholder="Enter price"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Quantity</label>
+          <input
+            v-model="newProductQuantity"
+            type="number"
+            placeholder="Enter quantity"
+          />
+        </div>
+
+        <button @click="editingProductId === null ? addProduct() : updateProduct()">
+          {{ editingProductId === null ? 'Add Product' : 'Update Product' }}
+        </button>
+
+      </div>
+
+      <!-- Products Section -->
+      <div id="products" class="products-section">
+
+        <h2>Products</h2>
+
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search products..."
+          class="search-input"
+        />
+
+        <!-- Stock Management -->
+        <h3 id="stock-management" class="stock-management-heading">
+          Stock Management
+        </h3>
+
+        <div class="table-container">
+          <table>
+
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-for="product in filteredProducts" :key="product.id">
+
+                <td>{{ product.id }}</td>
+
+                <td>{{ product.name }}</td>
+
+                <td>€{{ product.price.toFixed(2) }}</td>
+
+                <td>
+                  <span :class="product.quantity < 10 ? 'low-stock-badge' : 'stock-badge'">
+                    {{ product.quantity }}
+                  </span>
+                </td>
+
+                <td>
+                  <button
+                    class="edit-btn"
+                    @click="startEditing(product)"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    class="delete-btn"
+                    @click="deleteProduct(product.id)"
+                  >
+                    Delete
+                  </button>
+
+                  <button
+                    class="increase-btn"
+                    @click="updateStock(product.id, 1)"
+                  >
+                    +1
+                  </button>
+
+                  <button
+                    class="decrease-btn"
+                    @click="updateStock(product.id, -1)"
+                  >
+                    -1
+                  </button>
+                </td>
+
+              </tr>
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+
     </main>
 
   </div>
 </template>
 
+
+
+
 <style scoped>
+
+* {
+  box-sizing: border-box;
+}
+
 .app-container {
   display: flex;
   min-height: 100vh;
+  background: #f8fafc;
+  font-family: Inter, Arial, sans-serif;
 }
+
+/* =========================
+   SIDEBAR
+========================= */
 
 .sidebar {
   width: 240px;
-  background-color: #0e3f93;
+  min-width: 240px;
+  background: #102a56;
   color: white;
-  padding: 24px;
-}
-
-.main-content {
-  flex: 1;
-  padding: 32px;
-  background-color: #f4f6f9;
+  padding: 28px 20px;
 }
 
 .sidebar h2 {
-  font-size: 24px;
+  font-size: 23px;
+  font-weight: 700;
   margin-bottom: 40px;
+  letter-spacing: -0.5px;
 }
 
 .sidebar nav {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .sidebar a {
-  color: #cbd5e1;
+  color: #b8c7df;
   text-decoration: none;
   padding: 12px 16px;
-  border-radius: 8px;
-  transition: background-color 0.2s;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .sidebar a:hover {
-  background-color: #193e75;
+  background: #1c3b6c;
   color: white;
 }
 
 .sidebar a.active {
-  background-color: #2563eb;
+  background: #2563eb;
   color: white;
 }
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  padding: 36px;
+  background: #f8fafc;
+}
+
+.main-content h1 {
+  color: #0f172a;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+}
+
+/* =========================
+   DASHBOARD CARDS
+========================= */
+
 .dashboard-cards {
   display: flex;
-  gap: 20px;
+  gap: 22px;
   margin-top: 30px;
 }
 
 .card {
   flex: 1;
-  background-color: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  min-width: 0;
+  background: white;
+  padding: 26px;
+  border: 1px solid #e8edf4;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
 }
 
 .card h3 {
   color: #64748b;
   font-size: 14px;
-  font-weight: normal;
+  font-weight: 500;
+  margin: 0;
 }
 
 .card-number {
-  color: #17243a;
-  font-size: 28px;
-  font-weight: bold;
-  margin-top: 12px;
+  color: #0f172a;
+  font-size: 30px;
+  font-weight: 700;
+  margin-top: 14px;
+  letter-spacing: -0.8px;
 }
+
+/* =========================
+   PRODUCTS SECTION
+========================= */
+
 .products-section {
-  margin-top: 40px;
+  margin-top: 42px;
 }
 
 .products-section h2 {
-  color: #17243a;
+  color: #0f172a;
+  font-size: 21px;
+  font-weight: 650;
   margin-bottom: 20px;
+}
+
+/* =========================
+   TABLE CONTAINER
+========================= */
+
+.table-container {
+  background: white;
+  border: 1px solid #e8edf4;
+  border-radius: 14px;
+  padding: 8px;
+  overflow-x: auto;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
 }
 
 table {
   width: 100%;
+  min-width: 650px;
   border-collapse: collapse;
-  background-color: white;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-th,
-td {
-  padding: 16px;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
+  background: white;
 }
 
 th {
-  background-color: #f8fafc;
+  background: #f8fafc;
   color: #64748b;
+  font-size: 12px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  padding: 16px;
 }
 
 td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
   color: #334155;
+  font-size: 14px;
 }
+
+tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* =========================
+   ADD / EDIT PRODUCT FORM
+========================= */
 
 .add-product-section {
   margin-top: 40px;
-  padding: 24px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 28px;
+  background: white;
+  border: 1px solid #e8edf4;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
 }
 
 .add-product-section h2 {
-  margin-bottom: 20px;
-  color: #17243a;
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #0f172a;
+  font-size: 21px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
   margin-bottom: 8px;
   color: #334155;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .form-group input {
-  padding: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1px solid #dbe3ed;
+  border-radius: 9px;
   font-size: 14px;
+  color: #0f172a;
+  background: white;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+.form-group input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.form-group input::placeholder {
+  color: #94a3b8;
+}
+
+/* Form submit button */
+
 .add-product-section button {
-  padding: 12px 20px;
-  background-color: #2563eb;
+  padding: 11px 20px;
+  background: #2563eb;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .add-product-section button:hover {
-  background-color: #1d4ed8;
+  background: #1d4ed8;
+  transform: translateY(-1px);
 }
+
+/* =========================
+   PRODUCT ACTION BUTTONS
+========================= */
+
+.edit-btn,
+.delete-btn,
+.increase-btn,
+.decrease-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 3px;
+}
+
+.edit-btn {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.delete-btn {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.increase-btn {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.decrease-btn {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.edit-btn:hover {
+  background: #dbeafe;
+}
+
+.delete-btn:hover {
+  background: #fee2e2;
+}
+
+.increase-btn:hover {
+  background: #dcfce7;
+}
+
+.decrease-btn:hover {
+  background: #ffedd5;
+}
+
+.edit-btn:hover,
+.delete-btn:hover,
+.increase-btn:hover,
+.decrease-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 190px;
+    min-width: 190px;
+    padding: 22px 14px;
+  }
+
+  .main-content {
+    padding: 24px;
+  }
+
+  .dashboard-cards {
+    flex-wrap: wrap;
+  }
+
+  .card {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    padding: 18px;
+  }
+
+  .sidebar h2 {
+    margin-bottom: 18px;
+  }
+
+  .sidebar nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .dashboard-cards {
+    flex-direction: column;
+  }
+
+  .card {
+    width: 100%;
+  }
+}
+
+/* Dashboard card header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h3 {
+  margin: 0;
+}
+
+/* Dashboard icons */
+.card-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 20px;
+}
+
+.card-icon.blue {
+  background: #eff6ff;
+}
+
+.card-icon.green {
+  background: #f0fdf4;
+}
+
+.card-icon.orange {
+  background: #fff7ed;
+}
+
+/* Dashboard descriptions */
+.card-description {
+  color: #94a3b8;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+
+
+/* Add Product Form Layout */
+.add-product-section {
+  margin-top: 30px;
+}
+
+.add-product-section .form-group {
+  max-width: 100%;
+}
+
+@media (min-width: 900px) {
+  .add-product-section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 18px;
+  }
+
+  .add-product-section h2 {
+    width: 100%;
+  }
+
+  .add-product-section .form-group {
+    flex: 1;
+    min-width: 150px;
+    margin-bottom: 0;
+  }
+
+  .add-product-section button {
+    height: 42px;
+    margin-bottom: 0;
+  }
+}
+
+
+/* Stock quantity badges */
+.stock-badge,
+.low-stock-badge {
+  display: inline-block;
+  min-width: 35px;
+  padding: 5px 10px;
+  text-align: center;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stock-badge {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.low-stock-badge {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+
+/* Products search bar */
+.search-input {
+  width: 100%;
+  max-width: 350px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  border: 1px solid #dbe3ed;
+  border-radius: 9px;
+  background: white;
+  color: #0f172a;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+}
+
+
+/* Smooth navigation */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 25px;
+}
+
+/* Keep sidebar visible while scrolling */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  align-self: flex-start;
+}
+
+/* Stock management heading */
+.stock-management-heading {
+  color: #0f172a;
+  font-size: 17px;
+  margin: 20px 0 15px;
+}
+
 </style>
