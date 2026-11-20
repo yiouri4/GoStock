@@ -3,11 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 )
 
-func main() {
+func runCLI() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -273,5 +274,18 @@ func main() {
 		default:
 			fmt.Println("Invalid option. Please choose 1-7.")
 		}
+	}
+}
+
+func main() {
+	http.HandleFunc("/api/products", ProductsHandler)
+
+	fmt.Println("GoStock API server starting...")
+	fmt.Println("Server running at http://localhost:8080")
+
+	err := http.ListenAndServe(":8080", nil)
+
+	if err != nil {
+		fmt.Println("Server error:", err)
 	}
 }

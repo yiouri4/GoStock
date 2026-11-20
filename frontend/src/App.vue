@@ -1,17 +1,37 @@
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 // Sidebar navigation
 const activeSection = ref('dashboard')
 
 // Products
-const products = ref([
-  { id: 1, name: 'Laptop', price: 899.99, quantity: 5 },
-  { id: 2, name: 'Mouse', price: 24.99, quantity: 25 },
-  { id: 3, name: 'Keyboard', price: 59.99, quantity: 8 },
-  { id: 4, name: 'Monitor', price: 249.99, quantity: 3 },
-])
+const products = ref([])
+
+
+async function loadProducts() {
+  try {
+    const response = await fetch('http://localhost:8080/api/products')
+
+    if (!response.ok) {
+      throw new Error('Failed to load products')
+    }
+
+    const data = await response.json()
+
+    products.value = data
+
+    console.log('Products loaded from Go:', products.value)
+  } catch (error) {
+    console.error('Error loading products:', error)
+    alert('Could not connect to the Go backend.')
+  }
+}
+
+onMounted(() => {
+  loadProducts()
+})
+
 
 // Dashboard calculations
 const totalProducts = computed(() => {
@@ -49,7 +69,8 @@ const newProductPrice = ref('')
 const newProductQuantity = ref('')
 
 // Add product
-function addProduct() {
+
+async function addProduct() {
   const price = Number(newProductPrice.value)
   const quantity = Number(newProductQuantity.value)
 
@@ -66,19 +87,45 @@ function addProduct() {
     return
   }
 
+  const nextId = products.value.length > 0
+    ? Math.max(...products.value.map(product => product.id)) + 1
+    : 1
+
   const product = {
-    id: Date.now(),
-    name: newProductName.value,
+    id: nextId,
+    name: newProductName.value.trim(),
     price: price,
     quantity: quantity
   }
 
-  products.value.push(product)
+  try {
+    const response = await fetch('http://localhost:8080/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(product)
+    })
 
-  newProductName.value = ''
-  newProductPrice.value = ''
-  newProductQuantity.value = ''
+    if (!response.ok) {
+      const errorMessage = await response.text()
+      throw new Error(errorMessage)
+    }
+
+    await loadProducts()
+
+    newProductName.value = ''
+    newProductPrice.value = ''
+    newProductQuantity.value = ''
+
+    alert('Product added successfully!')
+  } catch (error) {
+    console.error('Error adding product:', error)
+    alert(error.message)
+  }
 }
+
+
 
 // Edit product
 const editingProductId = ref(null)
@@ -89,39 +136,95 @@ function startEditing(product) {
   newProductName.value = product.name
   newProductPrice.value = product.price
   newProductQuantity.value = product.quantity
+
+  activeSection.value = 'dashboard'
+
+  document.getElementById('add-product-section')?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center'
+  })
 }
 
-function updateProduct() {
+async function updateProduct() {
   const product = products.value.find(
     product => product.id === editingProductId.value
   )
 
-  if (!product) {
+  if (!product) return
+
+  const updatedProduct = {
+    id: product.id,
+    name: newProductName.value.trim(),
+    price: Number(newProductPrice.value),
+    quantity: Number(newProductQuantity.value)
+  }
+
+  if (
+    updatedProduct.name === '' ||
+    newProductPrice.value === '' ||
+    newProductQuantity.value === '' ||
+    !Number.isFinite(updatedProduct.price) ||
+    !Number.isFinite(updatedProduct.quantity) ||
+    updatedProduct.price < 0 ||
+    updatedProduct.quantity < 0
+  ) {
+    alert('Please enter valid product details.')
     return
   }
 
-  product.name = newProductName.value
-  product.price = Number(newProductPrice.value)
-  product.quantity = Number(newProductQuantity.value)
+  try {
+    const response = await fetch('http://localhost:8080/api/products', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedProduct)
+    })
 
-  editingProductId.value = null
+    if (!response.ok) {
+      const errorMessage = await response.text()
+      throw new Error(errorMessage)
+    }
 
-  newProductName.value = ''
-  newProductPrice.value = ''
-  newProductQuantity.value = ''
+    await loadProducts()
+
+    editingProductId.value = null
+    newProductName.value = ''
+    newProductPrice.value = ''
+    newProductQuantity.value = ''
+
+    alert('Product updated successfully!')
+  } catch (error) {
+    console.error('Error updating product:', error)
+    alert(error.message)
+  }
 }
 
 // Delete product
-function deleteProduct(id) {
+async function deleteProduct(id) {
   const confirmed = confirm('Are you sure you want to delete this product?')
+  if (!confirmed) return
 
-  if (!confirmed) {
-    return
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/products?id=${id}`,
+      {
+        method: 'DELETE'
+      }
+    )
+
+    if (!response.ok) {
+      const errorMessage = await response.text()
+      throw new Error(errorMessage)
+    }
+
+    await loadProducts()
+
+    alert('Product deleted successfully!')
+  } catch (error) {
+    console.error('Error deleting product:', error)
+    alert(error.message)
   }
-
-  products.value = products.value.filter(
-    product => product.id !== id
-  )
 }
 
 // Update stock
@@ -215,7 +318,7 @@ function updateStock(id, amount) {
       </div>
 
       <!-- Add / Edit Product Form -->
-      <div class="add-product-section">
+      <div id="add-product-section" class="add-product-section">
 
         <h2>
           {{ editingProductId === null ? 'Add New Product' : 'Edit Product' }}
