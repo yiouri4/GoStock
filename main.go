@@ -281,9 +281,13 @@ func main() {
 	http.HandleFunc("/api/products", ProductsHandler)
 
 	fmt.Println("GoStock API server starting...")
-	fmt.Println("Server running at http://localhost:8080")
+	port := os.Getenv("PORT")
 
-	err := http.ListenAndServe(":8080", nil)
+	if port == "" {
+		port = "10000"
+	}
+
+	err := http.ListenAndServe("0.0.0.0:"+port, nil)
 
 	if err != nil {
 		fmt.Println("Server error:", err)
