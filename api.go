@@ -9,7 +9,7 @@ import (
 
 func ProductsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	// Handle browser preflight requests.
@@ -115,6 +115,46 @@ func ProductsHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(updatedProduct)
+
+	case http.MethodPatch:
+		id := r.URL.Query().Get("id")
+
+		productID, err := strconv.Atoi(id)
+		if err != nil || productID <= 0 {
+			http.Error(w, "Invalid product ID", http.StatusBadRequest)
+			return
+		}
+
+		var request struct {
+			Amount int `json:"amount"`
+		}
+
+		err = json.NewDecoder(r.Body).Decode(&request)
+		if err != nil {
+			http.Error(w, "Invalid stock update data", http.StatusBadRequest)
+			return
+		}
+
+		products, err := LoadProducts()
+		if err != nil {
+			http.Error(w, "Could not load products", http.StatusInternalServerError)
+			return
+		}
+
+		updated := UpdateStock(&products, productID, request.Amount)
+		if !updated {
+			http.Error(w, "Product not found or invalid stock quantity", http.StatusBadRequest)
+			return
+		}
+
+		err = SaveProducts(products)
+		if err != nil {
+			http.Error(w, "Could not save products", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(products)
 
 	case http.MethodDelete:
 		id := r.URL.Query().Get("id")

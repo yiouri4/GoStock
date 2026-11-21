@@ -228,21 +228,36 @@ async function deleteProduct(id) {
 }
 
 // Update stock
-function updateStock(id, amount) {
-  const product = products.value.find(
-    product => product.id === id
-  )
 
-  if (!product) {
-    return
+// Update stock
+async function updateStock(id, amount) {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/products?id=${id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: amount
+        })
+      }
+    )
+
+    if (!response.ok) {
+      const errorMessage = await response.text()
+      throw new Error(errorMessage)
+    }
+
+    await loadProducts()
+
+  } catch (error) {
+    console.error('Error updating stock:', error)
+    alert(error.message)
   }
-
-  if (product.quantity + amount < 0) {
-    return
-  }
-
-  product.quantity += amount
 }
+
 </script>
 
 <template>
