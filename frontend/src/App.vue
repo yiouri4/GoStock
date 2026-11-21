@@ -13,7 +13,7 @@ const products = ref([])
 
 async function loadProducts() {
   try {
-    const response = await fetch('API_URL')
+    const response = await fetch(API_URL)
 
     if (!response.ok) {
       throw new Error('Failed to load products')
@@ -101,7 +101,7 @@ async function addProduct() {
   }
 
   try {
-    const response = await fetch('API_URL', {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -175,7 +175,7 @@ async function updateProduct() {
   }
 
   try {
-    const response = await fetch('API_URL', {
+    const response = await fetch(API_URL, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
