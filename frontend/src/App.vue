@@ -1,6 +1,8 @@
 
 <script setup>
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/products'
 import { ref, computed, onMounted } from 'vue'
+
 
 // Sidebar navigation
 const activeSection = ref('dashboard')
@@ -11,7 +13,7 @@ const products = ref([])
 
 async function loadProducts() {
   try {
-    const response = await fetch('http://localhost:8080/api/products')
+    const response = await fetch('API_URL')
 
     if (!response.ok) {
       throw new Error('Failed to load products')
@@ -99,7 +101,7 @@ async function addProduct() {
   }
 
   try {
-    const response = await fetch('http://localhost:8080/api/products', {
+    const response = await fetch('API_URL', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -173,7 +175,7 @@ async function updateProduct() {
   }
 
   try {
-    const response = await fetch('http://localhost:8080/api/products', {
+    const response = await fetch('API_URL', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -207,7 +209,7 @@ async function deleteProduct(id) {
 
   try {
     const response = await fetch(
-      `http://localhost:8080/api/products?id=${id}`,
+      `${API_URL}?id=${id}`,
       {
         method: 'DELETE'
       }
@@ -233,7 +235,7 @@ async function deleteProduct(id) {
 async function updateStock(id, amount) {
   try {
     const response = await fetch(
-      `http://localhost:8080/api/products?id=${id}`,
+      `${API_URL}?id=${id}`,
       {
         method: 'PATCH',
         headers: {
